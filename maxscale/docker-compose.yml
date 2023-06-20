@@ -35,4 +35,13 @@ services:
     maxscale:
         image: mariadb/maxscale:latest
         depends_on:
-            - master1    
+            - master1
+            - master2
+            - slave1
+        volumes:
+            - ./maxscale.cnf.d:/etc/maxscale.cnf.d
+        ports:
+            - "4006:4006"  # readwrite port
+            - "4008:4008"  
+            - "8989:8989"  
+
