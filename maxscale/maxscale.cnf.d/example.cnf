@@ -1,3 +1,6 @@
+[maxscale]
+threads=auto
+
 [server1]
 type=server
 address=master1
@@ -20,30 +23,17 @@ auto_failover=true
 auto_rejoin=true
 enforce_read_only_slaves=1
 
-[Shard1-Service]
+[Sharding-Service]
 type=service
 router=readwritesplit
-servers=server1
+servers=server1,server2
 user=maxuser
 password=maxpwd
 master_failure_mode=fail_on_write
 
-[Shard2-Service]
-type=service
-router=readwritesplit
-servers=server2
-user=maxuser
-password=maxpwd
-master_failure_mode=fail_on_write
-
-[Shard1-Listener]
+[Sharding-Listener]
 type=listener
-service=Shard1-Service
+service=Sharding-Service
 protocol=MySQLClient
 port=4006
 
-[Shard2-Listener]
-type=listener
-service=Shard2-Service
-protocol=MySQLClient
-port=4008
