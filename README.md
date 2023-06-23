@@ -39,3 +39,5 @@ To check Run sudo docker-compose exec maxscale maxctrl list servers amd ypur out
 
 
 Docker-compose down to bring down maxscale instance
+
+Follow this link for more assistance http://blog.data-alchemy.org/posts/maxscale-masterslave-container/
