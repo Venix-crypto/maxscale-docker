@@ -1,90 +1,41 @@
-# MariaDB MaxScale Docker image
+# MaxScale Docker image
 
-This Docker image runs the latest 2.4 version of MariaDB MaxScale.
+MaxScale-Docker is a Docker container image that provides a lightweight and portable deployment option for MaxScale, a database proxy for MariaDB and MySQL. It simplifies the process of deploying and managing MaxScale instances in a containerized environment. MaxScale-Docker allows users to easily scale and distribute database traffic while providing advanced features like load balancing, high availability, and routing.
 
--	[Travis CI:  
-	![build status badge](https://img.shields.io/travis/mariadb-corporation/maxscale-docker/master.svg)](https://travis-ci.org/mariadb-corporation/maxscale-docker/branches)
 
-## Running
-[The MaxScale docker-compose setup](./docker-compose.yml) contains MaxScale
-configured with a three node master-slave cluster. To start it, run the
-following commands in this directory.
+STEP ONE Clone Repo
+git clone https://github.com/name/your-project.git
 
-```
-docker-compose build
-docker-compose up -d
-```
 
-After MaxScale and the servers have started (takes a few minutes), you can find
-the readwritesplit router on port 4006 and the readconnroute on port 4008. The
-user `maxuser` with the password `maxpwd` can be used to test the cluster.
-Assuming the mariadb client is installed on the host machine:
-```
-$ mysql -umaxuser -pmaxpwd -h 127.0.0.1 -P 4006 test
-Welcome to the MariaDB monitor.  Commands end with ; or \g.
-Your MySQL connection id is 5
-Server version: 10.2.12 2.2.9-maxscale mariadb.org binary distribution
 
-Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+Step 2 Build an image and run the container
+docker build -t your-image-name 
+docker run -p  your-image-name
 
-Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+Step 3 Make Directory and navigate to that directory
+mkdir maxscale-config
+mkdir maxscale-config
+cd maxscale-config/maxscale
 
-MySQL [test]>
-```
-You can edit the [`maxscale.cnf.d/example.cnf`](./maxscale.cnf.d/example.cnf)
-file and recreate the MaxScale container to change the configuration.
+In the maxscale directory you can ls and find the maxscale.cnf 
+Open it with sudo nano maxscale.cnf and add configuration
 
-To stop the containers, execute the following command. Optionally, use the -v
-flag to also remove the volumes.
+After you've touched up the .cnf you run "Sudo docker-compose up" to see contents
+Put -d at the end of command to get a shorter version instead of seeing entire installation
 
-To run maxctrl in the container to see the status of the cluster:
-```
-$ docker-compose exec maxscale maxctrl list servers
-┌─────────┬─────────┬──────┬─────────────┬─────────────────┬──────────┐
-│ Server  │ Address │ Port │ Connections │ State           │ GTID     │
-├─────────┼─────────┼──────┼─────────────┼─────────────────┼──────────┤
-│ server1 │ master  │ 3306 │ 0           │ Master, Running │ 0-3000-5 │
-├─────────┼─────────┼──────┼─────────────┼─────────────────┼──────────┤
-│ server2 │ slave1  │ 3306 │ 0           │ Slave, Running  │ 0-3000-5 │
-├─────────┼─────────┼──────┼─────────────┼─────────────────┼──────────┤
-│ server3 │ slave2  │ 3306 │ 0           │ Running         │ 0-3000-5 │
-└─────────┴─────────┴──────┴─────────────┴─────────────────┴──────────┘
+Step 4 Check if servers are up
+To check Run sudo docker-compose exec maxscale maxctrl list servers amd ypur output should look similar:
 
-```
 
-The cluster is configured to utilize automatic failover. To illustrate this you can stop the master
-container and watch for maxscale to failover to one of the original slaves and then show it rejoining
-after recovery:
-```
-$ docker-compose stop master
-Stopping maxscaledocker_master_1 ... done
-$ docker-compose exec maxscale maxctrl list servers
-┌─────────┬─────────┬──────┬─────────────┬─────────────────┬─────────────┐
-│ Server  │ Address │ Port │ Connections │ State           │ GTID        │
-├─────────┼─────────┼──────┼─────────────┼─────────────────┼─────────────┤
-│ server1 │ master  │ 3306 │ 0           │ Down            │ 0-3000-5    │
-├─────────┼─────────┼──────┼─────────────┼─────────────────┼─────────────┤
-│ server2 │ slave1  │ 3306 │ 0           │ Master, Running │ 0-3001-7127 │
-├─────────┼─────────┼──────┼─────────────┼─────────────────┼─────────────┤
-│ server3 │ slave2  │ 3306 │ 0           │ Slave, Running  │ 0-3001-7127 │
-└─────────┴─────────┴──────┴─────────────┴─────────────────┴─────────────┘
-$ docker-compose start master
-Starting master ... done
-$ docker-compose exec maxscale maxctrl list servers
-┌─────────┬─────────┬──────┬─────────────┬─────────────────┬─────────────┐
-│ Server  │ Address │ Port │ Connections │ State           │ GTID        │
-├─────────┼─────────┼──────┼─────────────┼─────────────────┼─────────────┤
-│ server1 │ master  │ 3306 │ 0           │ Slave, Running  │ 0-3001-7127 │
-├─────────┼─────────┼──────┼─────────────┼─────────────────┼─────────────┤
-│ server2 │ slave1  │ 3306 │ 0           │ Master, Running │ 0-3001-7127 │
-├─────────┼─────────┼──────┼─────────────┼─────────────────┼─────────────┤
-│ server3 │ slave2  │ 3306 │ 0           │ Slave, Running  │ 0-3001-7127 │
-└─────────┴─────────┴──────┴─────────────┴─────────────────┴─────────────┘
+┌─────────┬─────────┬──────┬─────────────┬─────────────────┬──────────┬─────────────────┐
+│ Server  │ Address │ Port │ Connections │ State           │ GTID     │ Monitor         │
+├─────────┼─────────┼──────┼─────────────┼─────────────────┼──────────┼─────────────────┤
+│ server1 │ master  │ 3306 │ 0           │ Master, Running │ 0-3000-7 │ MariaDB-Monitor │
+├─────────┼─────────┼──────┼─────────────┼─────────────────┼──────────┼─────────────────┤
+│ server2 │ slave1  │ 3306 │ 0           │ Slave, Running  │ 0-3000-7 │ MariaDB-Monitor │
+├─────────┼─────────┼──────┼─────────────┼─────────────────┼──────────┼─────────────────┤                                 
+│ server3 │ slave2  │ 3306 │ 0           │ Slave, Running  │ 0-3000-7 │ MariaDB-Monitor │
+└─────────┴─────────┴──────┴─────────────┴─────────────────┴─
 
-```
 
-Once complete, to remove the cluster and maxscale containers:
-
-```
-docker-compose down -v
-```
+Docker-compose down to bring down maxscale instance
