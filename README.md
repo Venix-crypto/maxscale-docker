@@ -3,7 +3,8 @@
 MaxScale-Docker is a Docker container image that provides a lightweight and portable deployment option for MaxScale, a database proxy for MariaDB and MySQL. It simplifies the process of deploying and managing MaxScale instances in a containerized environment. MaxScale-Docker allows users to easily scale and distribute database traffic while providing advanced features like load balancing, high availability, and routing.
 
 
-STEP ONE Clone Repo
+#STEP 1:
+Clone Repo
 git clone https://github.com/name/your-project.git
 
 
